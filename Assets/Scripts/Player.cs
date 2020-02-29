@@ -29,6 +29,21 @@ public class Player : MonoBehaviour
     // 摄像机高度（即主角的脚相对于眼睛高度）
     float m_camHeight = 1.9f;
 
+    // 枪口transform
+    Transform m_muzzlepoint;
+
+    // 射击时，射线能射到的碰撞层
+    public LayerMask m_layer;
+
+    // 射中目标后的例子效果
+    public Transform m_fx;
+
+    // 射击音效
+    public AudioClip m_audio;
+
+    // 射击间隔时间计时器
+    float m_shootTimer = 0;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -47,6 +62,9 @@ public class Player : MonoBehaviour
 
         // 锁定鼠标
         Screen.lockCursor = true;
+
+        // 获取枪口位置
+        m_muzzlepoint = m_camTransform.Find("M16/weapon/muzzlepoint").transform;
     }
 
     // Update is called once per frame
@@ -56,6 +74,34 @@ public class Player : MonoBehaviour
             return;
         }
         Control();
+
+        // 更新射击间隔时间
+        m_shootTimer -= Time.deltaTime;
+
+        // 鼠标左键射击
+        if (Input.GetMouseButton(0) && m_shootTimer <= 0) {
+            m_shootTimer = 0.2f;
+            // 播放音效
+            this.GetComponent<AudioSource>().PlayOneShot(m_audio);
+            // 减少弹药
+            GameManager.Instance.ReduceAmmo(1);
+            // RaycastHit用来保存射线的探测结果
+            RaycastHit info;
+
+            // 从muzzlepoint的位置，向摄像机面向的正方向射出一根射线
+            // 射线只能与m_layer所指定的层碰撞
+            bool hit = Physics.Raycast(m_muzzlepoint.position, m_camTransform.TransformDirection(Vector3.forward), out info, 100, m_layer);
+            if (hit) {
+                // 如果射中了Tag为enemy的游戏体
+                if (info.transform.tag.CompareTo("Enemy") == 0) {
+                    Enemy enemy = info.transform.GetComponent<Enemy>();
+                    // 减少敌人生命
+                    enemy.OnDamage(1);
+                    // 在射中的地方释放一个粒子效果
+                    Instantiate(m_fx, info.point, info.transform.rotation);
+                }
+            }
+        }
     }
 
     void Control() {
@@ -87,5 +133,17 @@ public class Player : MonoBehaviour
     // 在编辑器中为主角显示一个图标
     void OnDrawGizmons() {
         Gizmos.DrawIcon(this.transform.position, "Spawn.tif");
+    }
+
+    public void OnDamage(int damage) {
+        m_life -= damage;
+
+        // 更新UI
+        GameManager.Instance.SetHP(m_life);
+
+        // 取消锁定鼠标光标
+        if (m_life <= 0) {
+            Screen.lockCursor = false;
+        }
     }
 }

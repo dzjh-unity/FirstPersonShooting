@@ -35,7 +35,7 @@ public class Enemy : MonoBehaviour
     // 攻击距离
     float attackDist = 1.5f;
 
-    void Init(EnemySpawn spawn) {
+    public void Init(EnemySpawn spawn) {
         m_spawn = spawn;
         m_spawn.m_enemyCnt ++;
     }

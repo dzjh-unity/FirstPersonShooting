@@ -27,7 +27,8 @@ public class Player : MonoBehaviour
     Vector3 m_camRot;
 
     // 摄像机高度（即主角的脚相对于眼睛高度）
-    float m_camHeight = 1.9f;
+    float m_camHeight = 1.8f;
+    float m_camWidth = 0.3f;
 
     // 枪口transform
     Transform m_muzzlepoint;
@@ -53,8 +54,8 @@ public class Player : MonoBehaviour
         // 获取摄像机
         m_camTransform = Camera.main.transform;
         
-        // 设置摄像机初始位置（使用TransformPoint获取Player在X轴便宜一定高度的位置）
-        m_camTransform.position = m_transform.TransformPoint(0, m_camHeight, 0);
+        // 设置摄像机初始位置（使用TransformPoint获取Player在X轴偏移一定高度的位置）
+        m_camTransform.position = m_transform.TransformPoint(0, m_camHeight, -m_camWidth);
 
         // 设置摄像机的旋转方向与主角一致
         m_camTransform.rotation = m_transform.rotation;
@@ -127,7 +128,7 @@ public class Player : MonoBehaviour
         m_transform.eulerAngles = camrot;
 
         // 更新摄像机位置（始终与Player一致）
-        m_camTransform.position = m_transform.TransformPoint(0, m_camHeight, 0);
+        m_camTransform.position = m_transform.TransformPoint(0, m_camHeight, -m_camWidth);
     }
 
     // 在编辑器中为主角显示一个图标

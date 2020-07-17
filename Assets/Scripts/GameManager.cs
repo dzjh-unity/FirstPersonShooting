@@ -35,8 +35,8 @@ public class GameManager : MonoBehaviour
 
          m_player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
 
-         GameObject uicanvas = GameObject.Find("Canvas");
-         foreach(Transform t in uicanvas.transform.GetComponentsInChildren<Transform>()) {
+         GameObject oldGameObj = GameObject.Find("Canvas/OldGameObject");
+         foreach(Transform t in oldGameObj.transform.GetComponentsInChildren<Transform>()) {
              if (t.name.CompareTo("TextAmmo") == 0) {
                 textAmmo = t.GetComponent<Text>();
              } else if (t.name.CompareTo("TextHP") == 0) {
